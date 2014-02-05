@@ -21,7 +21,7 @@
 	<body>
 		<div>
 			<?php
-				$pages = db('SELECT name FROM pages ORDER BY id ASC;');
+				$pages = db('SELECT name FROM pages ORDER BY id ASC');
 				foreach($pages as $page) {
 					if(isset($_GET['page']) && $page->name == $_GET['page']) {
 						echo $page->name . ' ';
@@ -34,7 +34,7 @@
 		<?php
 			if(isset($_GET['page'])) {
 				$page = db1('SELECT prow, ptable FROM pages WHERE name=?', $_GET['page']);
-				$colums = dba('SELECT coutput, cname, ctable, ccolum, crow FROM colums WHERE page=? ORDER BY id ASC;', $_GET['page']);
+				$colums = dba('SELECT id, page, coutput, cname, crow FROM colums WHERE page=? ORDER BY id ASC', $_GET['page']);
 				?>
 				<script>
 					/////////////////
@@ -42,13 +42,14 @@
 					/////////////////
 					var cOutputs	=	<?php echo json_encode(array_column($colums, 'coutput')); ?>;
 					var cNames		=	<?php echo json_encode(array_column($colums, 'cname')); ?>;
-					var cTables		=	<?php echo json_encode(array_column($colums, 'ctable')); ?>;
-					var cColums		=	<?php echo json_encode(array_column($colums, 'ccolum')); ?>;
 					var cRows		=	<?php echo json_encode(array_column($colums, 'crow')); ?>;
+					var cIds		=	<?php echo json_encode(array_column($colums, 'id')); ?>;
 					var pTable		=	'<?php echo $page->ptable; ?>';
 					var pRow		=	<?php echo $page->prow; ?>;
-					var jsonUrl		=	'data.php?page=<?php echo urlencode($_GET['page']); ?>';
+					var page		=	'<?php echo urlencode($_GET['page']); ?>';
 					
+					
+					var jsonUrl		=	'data.php?page=' + page;
 					function insertRowWithData(rowData) {
 						var tableRow = table.insertRow(-1);
 						tableRow.dataset.row = rowData[pRow];
@@ -59,9 +60,8 @@
 							var input = document.createElement('input');
 							input.type = 'text';
 							input.value = rowData[cOutputs[displayColum]];
-							input.dataset.cTable = cTables[displayColum];
-							input.dataset.cColum = cColums[displayColum];
 							input.dataset.cOutput = cOutputs[displayColum];
+							input.dataset.cId = cIds[displayColum];
 							if(rowData[cRows[displayColum]] != null) {
 								input.dataset.cRow = rowData[cRows[displayColum]];
 							}
@@ -79,11 +79,6 @@
 										break;
 									}
 								}
-								
-								var table = this.dataset.cTable;
-								var colom = this.dataset.cColum;
-								var row = this.dataset.cRow;
-								var value = this.value;
 								
 								var request;
 								if(window.XMLHttpRequest) {
@@ -108,13 +103,12 @@
 								request.open('POST','update.php?<?php echo htmlspecialchars(SID); ?>',true);
 								request.setRequestHeader('Content-type','application/x-www-form-urlencoded');
 								var pramiters = 'password=' + encodeURIComponent(passwordBox.value) + 
-												'&table=' + encodeURIComponent(table) +
-												'&colum=' + encodeURIComponent(colom);
-								if(typeof row != 'undefined') {
-									pramiters += '&row=' + encodeURIComponent(row);
+												'&colum=' + encodeURIComponent(this.dataset.cId);
+								if(typeof this.dataset.cRow != 'undefined') {
+									pramiters += '&row=' + encodeURIComponent(this.dataset.cRow);
 								}
-								if(value != '') {
-									pramiters += '&value=' + encodeURIComponent(value);
+								if(this.value != '') {
+									pramiters += '&value=' + encodeURIComponent(this.value);
 								}
 								request.send(pramiters);
 							};

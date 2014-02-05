@@ -1,3 +1,7 @@
+----------------------------------------
+-- THIS FILE HAS NOT YET BEEN UPDATED --
+----------------------------------------
+
 SELECT
 	heats.number AS heat,
 	heats.id AS heatid,

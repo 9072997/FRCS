@@ -21,6 +21,7 @@
 	$dbName = 'frc';
 	
 	$dbObject = new PDO("pgsql:host=$dbServer;dbname=$dbName", $dbUser, $dbPassword);
+	$dbObject->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	
 	function dbQuery($sql, $prams) { // caches perpared statements
 		global $dbObject;

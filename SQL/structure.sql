@@ -85,9 +85,7 @@ CREATE TABLE colums (
 		ON DELETE SET NULL,
 	coutput INT,
 	cname VARCHAR(255),
-	cinsert VARCHAR(255),
-	cupdate VARCHAR(255),
-	crow INT
+	cmodify TEXT
 );
 
 CREATE TABLE passwords (

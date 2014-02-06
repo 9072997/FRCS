@@ -37,52 +37,36 @@
 			}
 		} else {
 			if(isset($_POST['row'])) {
-				$row =  $_POST['row'];
-				// UPDATE
-				$colum =  $_POST['colum'];
-				$sql = db1('SELECT cupdate FROM colums WHERE id=?', $colum)->cupdate;
-				var_dump($colum);
+				$row = $_POST['row'];
+				$colum = $_POST['colum'];
+				// UPDATE or INSERT
+				$sql = db1('SELECT cmodify FROM colums WHERE id=?', $colum)->cmodify;
 				if(isset($_POST['value'])) {
-					$value =  $_POST['value'];
-					if(!isset($dbQueries[$sql])) {
-						$dbQueries[$sql] = $dbObject->prepare($sql);
-					}
-					$dbQueries[$sql]->bindValue(':row', $row);
-					$dbQueries[$sql]->bindValue(':value', $value);
-					if($dbQueries[$sql]->execute() === false) {
-						http_response_code(500); // DB Error
+					$value = $_POST['value'];
+					foreach(explode(';', $sql) as $query) {
+						if(!isset($dbQueries[$query])) {
+							$dbQueries[$query] = $dbObject->prepare($query);
+						}
+						if(strpos($query, ':row') !== false) {
+							$dbQueries[$query]->bindValue(':row', $row);
+						}
+						if(strpos($query, ':value') !== false) {
+							$dbQueries[$query]->bindValue(':value', $value);
+						}
+						if($dbQueries[$query]->execute() === false) {
+							http_response_code(500); // DB Error
+						}
 					}
 				} else {
 					$sql = str_replace(':value', 'NULL', $sql);
-					if(!isset($dbQueries[$sql])) {
-						$dbQueries[$sql] = $dbObject->prepare($sql);
-					}
-					$dbQueries[$sql]->bindValue(':row', $row);
-					if($dbQueries[$sql]->execute() === false) {
-						http_response_code(500); // DB Error
-					}
-				}
-			} else {
-				if(isset($_POST['page'])) {
-					// INSERT
-					$page =  $_POST['page'];
-					$sql = db1('SELECT cinsert FROM colums WHERE WHERE id=?', $colum)->cinsert;
-					
-					if(isset($_POST['value'])) {
-						$value =  $_POST['value'];
-						if(!isset($dbQueries[$sql])) {
-							$dbQueries[$sql] = $dbObject->prepare($sql);
+					foreach(explode(';', $sql) as $query) {
+						if(!isset($dbQueries[$query])) {
+							$dbQueries[$query] = $dbObject->prepare($query);
 						}
-						$dbQueries[$sql]->bindValue(':value', $value);
-						if($dbQueries[$sql]->execute() === false) {
-							http_response_code(500); // DB Error
+						if(strpos($query, ':row') !== false) {
+							$dbQueries[$query]->bindValue(':row', $row);
 						}
-					} else {
-						$sql = str_replace(':value', 'NULL', $sql);
-						if(!isset($dbQueries[$sql])) {
-							$dbQueries[$sql] = $dbObject->prepare($sql);
-						}
-						if($dbQueries[$sql]->execute() === false) {
+						if($dbQueries[$query]->execute() === false) {
 							http_response_code(500); // DB Error
 						}
 					}

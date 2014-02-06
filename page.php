@@ -50,7 +50,7 @@
 		<?php
 			if(isset($_GET['page'])) {
 				$page = db1('SELECT prow, ptable FROM pages WHERE name=?', $_GET['page']);
-				$colums = dba('SELECT id, page, coutput, cname, crow FROM colums WHERE page=? ORDER BY id ASC', $_GET['page']);
+				$colums = dba('SELECT id, page, coutput, cname FROM colums WHERE page=? ORDER BY id ASC', $_GET['page']);
 				?>
 				<script>
 					/////////////////
@@ -58,7 +58,6 @@
 					/////////////////
 					var cOutputs	=	<?php echo json_encode(array_column($colums, 'coutput')); ?>;
 					var cNames		=	<?php echo json_encode(array_column($colums, 'cname')); ?>;
-					var cRows		=	<?php echo json_encode(array_column($colums, 'crow')); ?>;
 					var cIds		=	<?php echo json_encode(array_column($colums, 'id')); ?>;
 					var pTable		=	'<?php echo $page->ptable; ?>';
 					var pRow		=	<?php echo $page->prow; ?>;
@@ -78,9 +77,6 @@
 							input.value = rowData[cOutputs[displayColum]];
 							input.dataset.cOutput = cOutputs[displayColum];
 							input.dataset.cId = cIds[displayColum];
-							if(rowData[cRows[displayColum]] != null) {
-								input.dataset.cRow = rowData[cRows[displayColum]];
-							}
 							input.onfocus = function() {
 								this.style.backgroundColor = 'yellow';
 							};
@@ -119,10 +115,8 @@
 								request.open('POST','update.php?<?php echo htmlspecialchars(SID); ?>',true);
 								request.setRequestHeader('Content-type','application/x-www-form-urlencoded');
 								var pramiters = 'password=' + encodeURIComponent(passwordBox.value) + 
-												'&colum=' + encodeURIComponent(this.dataset.cId);
-								if(typeof this.dataset.cRow != 'undefined') {
-									pramiters += '&row=' + encodeURIComponent(this.dataset.cRow);
-								}
+												'&colum=' + encodeURIComponent(this.dataset.cId) +
+												'&row=' + encodeURIComponent(this.parentNode.parentNode.dataset.row);
 								if(this.value != '') {
 									pramiters += '&value=' + encodeURIComponent(this.value);
 								}

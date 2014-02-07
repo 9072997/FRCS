@@ -14,11 +14,12 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-INSERT INTO pages	(	name,		query,																prow,	ptable	) VALUES
-					(	'Pages',	'SELECT id, name, query, prow, ptable FROM pages ORDER BY id ASC',	'0',	'pages'	);
+INSERT INTO pages	(	name,		query,																				prow,	ptable	) VALUES
+					(	'Pages',	'SELECT id, name, weight, query, prow, ptable FROM pages ORDER BY weight, id ASC',	'0',	'pages'	);
 					
 INSERT INTO colums	(	page,		cname,		coutput,	cmodify											) VALUES
 					(	'Pages',	'Name',		1,			'UPDATE pages SET name=:value WHERE id=:row'	),
-					(	'Pages',	'Query',	2,			'UPDATE pages SET query=:value WHERE id=:row'	),
-					(	'Pages',	'pRow',		3,			'UPDATE pages SET prow=:value WHERE id=:row'	),
-					(	'Pages',	'pTable',	4,			'UPDATE pages SET ptable=:value WHERE id=:row'	);
+					(	'Pages',	'Weight',	2,			'UPDATE pages SET weight=:value WHERE id=:row'	),
+					(	'Pages',	'Query',	3,			'UPDATE pages SET query=:value WHERE id=:row'	),
+					(	'Pages',	'pRow',		4,			'UPDATE pages SET prow=:value WHERE id=:row'	),
+					(	'Pages',	'pTable',	5,			'UPDATE pages SET ptable=:value WHERE id=:row'	);

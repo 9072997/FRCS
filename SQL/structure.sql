@@ -73,6 +73,7 @@ CREATE TABLE sheets (
 CREATE TABLE pages (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(255) UNIQUE,
+	weight INT,
 	query TEXT,
 	prow INT,
 	ptable VARCHAR(255)
@@ -86,5 +87,6 @@ CREATE TABLE colums (
 		ON DELETE SET NULL,
 	coutput INT,
 	cname VARCHAR(255),
+	weight INT,
 	cmodify TEXT
 );

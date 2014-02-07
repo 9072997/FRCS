@@ -38,11 +38,11 @@ CREATE TABLE queueings (
 	heat INT
 		REFERENCES heats (number)
 		ON UPDATE CASCADE
-		ON DELETE SET NULL,
+		ON DELETE CASCADE,
 	team INT
 		REFERENCES teams (number)
 		ON UPDATE CASCADE
-		ON DELETE SET NULL,
+		ON DELETE CASCADE,
 	position feildposition,
 	UNIQUE (heat, position),
 	UNIQUE (heat, team)
@@ -65,7 +65,7 @@ CREATE TABLE sheets (
 	FOREIGN KEY (heat, team)
 		REFERENCES queueings (heat, team)
 		ON UPDATE CASCADE
-		ON DELETE SET NULL,
+		ON DELETE CASCADE,
 	UNIQUE (heat, scout),
 	UNIQUE (heat, team)
 );
@@ -84,7 +84,7 @@ CREATE TABLE colums (
 	page VARCHAR(255)
 		REFERENCES pages (name)
 		ON UPDATE CASCADE
-		ON DELETE SET NULL,
+		ON DELETE CASCADE,
 	coutput INT,
 	cname VARCHAR(255),
 	weight INT,

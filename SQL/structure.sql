@@ -50,7 +50,8 @@ CREATE TABLE queueings (
 
 CREATE TABLE scouts (
 	id SERIAL PRIMARY KEY,
-	name VARCHAR(255) UNIQUE
+	name VARCHAR(255) UNIQUE,
+	password VARCHAR(255)
 );
 
 CREATE TABLE sheets (
@@ -86,13 +87,4 @@ CREATE TABLE colums (
 	coutput INT,
 	cname VARCHAR(255),
 	cmodify TEXT
-);
-
-CREATE TABLE passwords (
-	id SERIAL PRIMARY KEY,
-	scout VARCHAR(255)
-		REFERENCES scouts (name)
-		ON UPDATE CASCADE
-		ON DELETE SET NULL,
-	password VARCHAR(32)
 );

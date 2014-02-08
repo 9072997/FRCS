@@ -276,9 +276,10 @@
 										if(table.rows[row].style.backgroundColor == 'red') {
 											table.deleteRow(row);
 											row--; // fix moving indexes
+										} else {
+											// set all rows red
+											table.rows[row].style.backgroundColor = 'red';
 										}
-										// set all rows red
-										table.rows[row].style.backgroundColor = 'red';
 									}
 
 									

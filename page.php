@@ -37,7 +37,7 @@
 	<body>
 		<div>
 			<?php
-				$pages = db('SELECT name FROM pages ORDER BY id ASC');
+				$pages = db('SELECT name FROM pages ORDER BY weight, id ASC');
 				foreach($pages as $page) {
 					if(isset($_GET['page']) && $page->name == $_GET['page']) {
 						echo $page->name . ' ';

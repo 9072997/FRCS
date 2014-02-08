@@ -14,12 +14,12 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-INSERT INTO pages	(	name,		query,																					prow,	ptable		) VALUES
-					(	'Colums',	'SELECT id, page, coutput, cname, weight, cmodify FROM colums ORDER BY weight, id ASC',	'0',	'colums'	);
+INSERT INTO pages	(	name,		weight,	query,																																														prow,	ptable		) VALUES
+					(	'Colums',	30,		'SELECT colums.id, colums.page, colums.coutput, colums.cname, colums.weight, colums.cmodify FROM colums LEFT JOIN pages ON colums.page=pages.name ORDER BY pages.weight, weight, id ASC',	'0',	'colums'	);
 					
-INSERT INTO colums	(	page,		cname,			coutput,	cmodify												) VALUES
-					(	'Colums',	'Page',			1,			'UPDATE colums SET page=:value WHERE id=:row'		),
-					(	'Colums',	'Output Colum',	2,			'UPDATE colums SET coutput=:value WHERE id=:row'	),
-					(	'Colums',	'Colum Name',	3,			'UPDATE colums SET cname=:value WHERE id=:row'		),
-					(	'Colums',	'Weight',		4,			'UPDATE colums SET weight=:value WHERE id=:row'		),
-					(	'Colums',	'SQL',			5,			'UPDATE colums SET cmodify=:value WHERE id=:row'	);
+INSERT INTO colums	(	page,		cname,			weight,	coutput,	cmodify												) VALUES
+					(	'Colums',	'Page',			5,		1,			'UPDATE colums SET page=:value WHERE id=:row'		),
+					(	'Colums',	'Output Colum',	10,		2,			'UPDATE colums SET coutput=:value WHERE id=:row'	),
+					(	'Colums',	'Colum Name',	15,		3,			'UPDATE colums SET cname=:value WHERE id=:row'		),
+					(	'Colums',	'Weight',		20,		4,			'UPDATE colums SET weight=:value WHERE id=:row'		),
+					(	'Colums',	'SQL',			25,		5,			'UPDATE colums SET cmodify=:value WHERE id=:row'	);

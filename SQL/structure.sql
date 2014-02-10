@@ -90,3 +90,99 @@ CREATE TABLE colums (
 	weight INT,
 	cmodify TEXT
 );
+
+CREATE VIEW matchsheet AS
+	SELECT
+		heats.number AS heat,
+		heats.starttime as starttime,
+		red1.team AS red1,
+		red2.team AS red2,
+		red3.team AS red3,
+		blue1.team AS blue1,
+		blue2.team AS blue2,
+		blue3.team AS blue3
+		
+	FROM heats
+		LEFT JOIN queueings red1 ON (
+				heats.number=red1.heat
+			AND
+				red1.position='red1'
+			)
+		
+		LEFT JOIN queueings red2 ON (
+				heats.number=red2.heat
+			AND
+				red2.position='red2'
+			)
+		
+		LEFT JOIN queueings red3 ON (
+				heats.number=red3.heat
+			AND
+				red3.position='red3'
+			)
+		
+		LEFT JOIN queueings blue1 ON (
+				heats.number=blue1.heat
+			AND
+				blue1.position='blue1'
+			)
+		
+		LEFT JOIN queueings blue2 ON (
+				heats.number=blue2.heat
+			AND
+				blue2.position='blue2'
+			)
+		
+		LEFT JOIN queueings blue3 ON (
+				heats.number=blue3.heat
+			AND
+				blue3.position='blue3'
+			)
+
+	ORDER BY heat ASC;
+
+CREATE FUNCTION queueingupsert(INT, feildposition, INT) RETURNS VOID AS
+	$$
+		INSERT INTO queueings(heat, position)
+			SELECT $1, $2
+			WHERE NOT EXISTS (
+				SELECT 1 FROM queueings WHERE heat=$1 AND position=$2
+			);
+		UPDATE queueings SET team=$3 WHERE heat=$1 AND position=$2;
+	$$
+	LANGUAGE sql VOLATILE;
+
+CREATE FUNCTION queueingsinsert(INT, timestamp, INT, INT, INT, INT, INT, INT) RETURNS VOID AS
+	$$
+		INSERT INTO heats(number, starttime) VALUES ($1, $2);
+		SELECT queueingupsert($1, 'red1', $3);
+		SELECT queueingupsert($1, 'red2', $4);
+		SELECT queueingupsert($1, 'red3', $5);
+		SELECT queueingupsert($1, 'blue1', $6);
+		SELECT queueingupsert($1, 'blue2', $7);
+		SELECT queueingupsert($1, 'blue3', $8);
+		
+	$$
+	LANGUAGE sql VOLATILE;
+
+CREATE FUNCTION queueingsupdate(INT, timestamp, INT, INT, INT, INT, INT, INT) RETURNS VOID AS
+	$$
+		UPDATE heats SET starttime=$2 WHERE number=$1;
+		SELECT queueingupsert($1, 'red1', $3);
+		SELECT queueingupsert($1, 'red2', $4);
+		SELECT queueingupsert($1, 'red3', $5);
+		SELECT queueingupsert($1, 'blue1', $6);
+		SELECT queueingupsert($1, 'blue2', $7);
+		SELECT queueingupsert($1, 'blue3', $8);
+		
+	$$
+	LANGUAGE sql VOLATILE;
+
+CREATE RULE update AS ON UPDATE TO matchsheet DO INSTEAD
+	SELECT queueingsupdate(NEW.heat, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
+
+CREATE RULE insert AS ON INSERT TO matchsheet DO INSTEAD
+	SELECT queueingsinsert(NEW.heat, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
+
+CREATE RULE delete AS ON DELETE TO matchsheet DO INSTEAD
+	DELETE FROM heats WHERE number=OLD.heat;

@@ -187,3 +187,5 @@ CREATE RULE insert AS ON INSERT TO matchsheet DO INSTEAD
 
 CREATE RULE delete AS ON DELETE TO matchsheet DO INSTEAD
 	DELETE FROM heats WHERE number=OLD.heat;
+
+CREATE SEQUENCE teamnamedup;

@@ -33,16 +33,16 @@
 								$team->nickname,
 								$team->number,
 								$team->nickname);
-		db0('INSERT INTO teams(number, name) SELECT ?, ? WHERE NOT EXISTS (SELECT 1 FROM teams WHERE number=?)',
+		db0('INSERT INTO teams(number, name) SELECT ?, (? || \' DUP \' || CAST(NEXTVAL(\'teamnamedup\') AS TEXT)) WHERE NOT EXISTS (SELECT 1 FROM teams WHERE number=?)',
 								$team->number,
-								$team->nickname . ' DUP ' . str_pad(rand(0,999), 3, '0', STR_PAD_LEFT),
+								$team->nickname,
 								$team->number);
 		db0('UPDATE teams SET name=? WHERE number=? AND NOT EXISTS (SELECT 1 FROM teams WHERE name=?)',
 								$team->nickname,
 								$team->number,
 								$team->nickname);
-		db0('UPDATE teams SET name=? WHERE number=? AND name IS NULL',
-								$team->nickname . ' DUP ' . str_pad(rand(0,999), 3, '0', STR_PAD_LEFT),
+		db0('UPDATE teams SET name=(? || \' DUP \' || CAST(NEXTVAL(\'teamnamedup\') AS TEXT)) WHERE number=? AND name IS NULL',
+								$team->nickname,
 								$team->number);
 	}
 	

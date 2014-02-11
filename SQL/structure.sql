@@ -148,8 +148,16 @@ CREATE FUNCTION queueingupsert(INT, feildposition, INT) RETURNS VOID AS
 			SELECT $1, $2
 			WHERE NOT EXISTS (
 				SELECT 1 FROM queueings WHERE heat=$1 AND position=$2
-			);
-		UPDATE queueings SET team=$3 WHERE heat=$1 AND position=$2;
+			) AND
+			$1 IS NOT NULL AND
+			$2 IS NOT NULL AND
+			$3 IS NOT NULL;
+		UPDATE queueings SET team=$3 WHERE heat=$1 AND position=$2 AND
+			$1 IS NOT NULL AND
+			$2 IS NOT NULL AND
+			$3 IS NOT NULL;
+		DELETE FROM queueings WHERE heat=$1 AND position=$2 AND $3 IS NULL;
+			
 	$$
 	LANGUAGE sql VOLATILE;
 

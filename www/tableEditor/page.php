@@ -15,8 +15,8 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	
-	require_once('db.inc.php');
-	require_once('array_column.inc.php'); // just incase our version of php dosent include this function
+	require_once(dirname(__FILE__) . '/../../includes/db.inc.php');
+	require_once(dirname(__FILE__) . '/../../includes/array_column.inc.php'); // just incase our version of php dosent include this function
 	
 	ini_set('session.use_only_cookies',0);
 	session_start();
@@ -62,7 +62,6 @@
 					var pTable		=	'<?php echo $page->ptable; ?>';
 					var pRow		=	<?php echo $page->prow; ?>;
 					var page		=	'<?php echo urlencode($_GET['page']); ?>';
-					
 					
 					var jsonUrl		=	'data.php?page=' + page;
 					function insertRowWithData(rowData) {
@@ -128,7 +127,7 @@
 						
 						var tableCell = tableRow.insertCell(-1);
 						var deleteRowButton = document.createElement('button');
-						deleteRowButton.appendChild(document.createTextNode('Delete Row'));
+						deleteRowButton.appendChild(document.createTextNode('Delete'));
 						deleteRowButton.onclick = function() {
 							if(confirm('OK to Delete?')) {
 								this.style.backgroundColor = 'yellow';
@@ -166,6 +165,7 @@
 						return tableRow;
 					}
 					
+					var refreshRate = 5000;
 					var request, data, newData, table, passwordBox;
 
 					if(window.XMLHttpRequest) {
@@ -316,6 +316,12 @@
 										}
 									}
 								}
+															refreshRate = 150000;
+								if(newData.length < 1000)	refreshRate =  75000; 
+								if(newData.length <  500)	refreshRate =  15000;
+								if(newData.length <  250)	refreshRate =   5000;
+								if(newData.length <  100)	refreshRate =   3000;
+								if(newData.length <   50)	refreshRate =   2000;
 								data = newData;
 								document.body.style.backgroundColor = null;
 							} else {
@@ -324,7 +330,7 @@
 							setTimeout(function() {
 								request.open('GET', jsonUrl, true);
 								request.send();
-							}, 2000);
+							}, refreshRate);
 						}
 					}
 					

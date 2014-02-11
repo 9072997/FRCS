@@ -93,6 +93,7 @@ CREATE TABLE colums (
 
 CREATE VIEW matchsheet AS
 	SELECT
+		heats.id AS id,
 		heats.number AS heat,
 		heats.starttime as starttime,
 		red1.team AS red1,
@@ -165,21 +166,21 @@ CREATE FUNCTION queueingsinsert(INT, timestamp, INT, INT, INT, INT, INT, INT) RE
 	$$
 	LANGUAGE sql VOLATILE;
 
-CREATE FUNCTION queueingsupdate(INT, timestamp, INT, INT, INT, INT, INT, INT) RETURNS VOID AS
+CREATE FUNCTION queueingsupdate(INT, INT, timestamp, INT, INT, INT, INT, INT, INT) RETURNS VOID AS
 	$$
-		UPDATE heats SET starttime=$2 WHERE number=$1;
-		SELECT queueingupsert($1, 'red1', $3);
-		SELECT queueingupsert($1, 'red2', $4);
-		SELECT queueingupsert($1, 'red3', $5);
-		SELECT queueingupsert($1, 'blue1', $6);
-		SELECT queueingupsert($1, 'blue2', $7);
-		SELECT queueingupsert($1, 'blue3', $8);
+		UPDATE heats SET number=$2, starttime=$3 WHERE id=$1;
+		SELECT queueingupsert($2, 'red1', $4);
+		SELECT queueingupsert($2, 'red2', $5);
+		SELECT queueingupsert($2, 'red3', $6);
+		SELECT queueingupsert($2, 'blue1', $7);
+		SELECT queueingupsert($2, 'blue2', $8);
+		SELECT queueingupsert($2, 'blue3', $9);
 		
 	$$
 	LANGUAGE sql VOLATILE;
 
 CREATE RULE update AS ON UPDATE TO matchsheet DO INSTEAD
-	SELECT queueingsupdate(NEW.heat, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
+	SELECT queueingsupdate(NEW.id, NEW.heat, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
 
 CREATE RULE insert AS ON INSERT TO matchsheet DO INSTEAD
 	SELECT queueingsinsert(NEW.heat, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);

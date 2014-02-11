@@ -19,8 +19,9 @@
 	session_start();
 	$_SESSION['password'] = $_POST['password'];
 	
-	require_once('db.inc.php');
-	if(db1('SELECT EXISTS(SELECT 1 FROM scouts WHERE password=?) as match;', $_POST['password'])->match) {
+	require_once(dirname(__FILE__) . '/../../includes/db.inc.php');
+	
+	if(db1('SELECT EXISTS(SELECT 1 FROM scouts WHERE password=?) as match', $_POST['password'])->match) {
 		if(isset($_POST['table'])) {
 			$table = $_POST['table'];
 			if(isset($_POST['row'])) {

@@ -15,7 +15,6 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	
-	require_once('db.inc.php');
-	$query = db1('SELECT query FROM pages WHERE name=?', $_GET['page'])->query;
-	echo db4js($query);
+	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 ?>

@@ -176,6 +176,11 @@ CREATE FUNCTION queueingsinsert(INT, timestamp, INT, INT, INT, INT, INT, INT) RE
 
 CREATE FUNCTION queueingsupdate(INT, INT, timestamp, INT, INT, INT, INT, INT, INT) RETURNS VOID AS
 	$$
+		DELETE FROM queueings WHERE id IN (
+			SELECT queueings.id FROM queueings
+				LEFT JOIN heats ON queueings.heat=heats.number
+				WHERE heats.id=$1
+			) AND $2 IS NULL;
 		UPDATE heats SET number=$2, starttime=$3 WHERE id=$1;
 		SELECT queueingupsert($2, 'red1', $4);
 		SELECT queueingupsert($2, 'red2', $5);

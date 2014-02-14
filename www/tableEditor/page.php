@@ -76,6 +76,9 @@
 							input.value = rowData[cOutputs[displayColumn]];
 							input.dataset.cOutput = cOutputs[displayColumn];
 							input.dataset.cId = cIds[displayColumn];
+							if(cOutputs.length >= 6) {
+								input.style.width = '50px';
+							}
 							input.onfocus = function() {
 								this.style.backgroundColor = 'yellow';
 							};

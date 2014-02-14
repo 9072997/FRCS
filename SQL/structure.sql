@@ -79,7 +79,7 @@ CREATE TABLE pages (
 	ptable VARCHAR(255)
 );
 
-CREATE TABLE colums (
+CREATE TABLE columns (
 	id SERIAL PRIMARY KEY,
 	page VARCHAR(255)
 		REFERENCES pages (name)

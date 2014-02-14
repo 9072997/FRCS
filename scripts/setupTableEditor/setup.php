@@ -23,7 +23,7 @@
 		db0('CREATE SCHEMA public');
 		$dbObject->exec(file_get_contents(dirname(__FILE__) . '/../../SQL/structure.sql'));
 	} else {
-		db0('TRUNCATE colums');
+		db0('TRUNCATE columns');
 		db0('DELETE FROM pages');
 	}
 	require_once(dirname(__FILE__) . '/generateSchema.php');

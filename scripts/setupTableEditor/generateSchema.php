@@ -25,26 +25,26 @@
 	foreach($tableNames as $tableName) {
 		$tableWeight += 5;
 		if(db1('SELECT NOT EXISTS(SELECT 1 FROM pages WHERE ptable=?) as match', $tableName)->match) {
-			$colums = dba('SELECT column_name, ordinal_position from INFORMATION_SCHEMA.COLUMNS WHERE table_schema=\'public\' AND table_name=? ORDER BY ordinal_position ASC', $tableName);
+			$columns = dba('SELECT column_name, ordinal_position from INFORMATION_SCHEMA.COLUMNS WHERE table_schema=\'public\' AND table_name=? ORDER BY ordinal_position ASC', $tableName);
 			
-			$columNames = array_column($colums, 'column_name');
-			$csvColumNames = rtrim(implode(', ', $columNames), ', ');
+			$columnNames = array_column($columns, 'column_name');
+			$csvColumnNames = rtrim(implode(', ', $columnNames), ', ');
 			$humanName = ucfirst($tableName);
 			db0('INSERT INTO pages (name, weight, query, prow, ptable) VALUES(?, ?, ?, ?, ?)',
 									$humanName,
 									$tableWeight,
-									'SELECT ' . $csvColumNames . ' FROM ' . $tableName, // notice no auto order by clause
-									0, // this is an assumption that colum 1 is unique
+									'SELECT ' . $csvColumnNames . ' FROM ' . $tableName, // notice no auto order by clause
+									0, // this is an assumption that column 1 is unique
 									$tableName);
 			
-			foreach($colums as $colum) {
-				if($colum['column_name'] != 'id') {
-					db0('INSERT INTO colums(page, cname, weight, coutput, cmodify) VALUES(?, ?, ?, ?, ?)',
+			foreach($columns as $column) {
+				if($column['column_name'] != 'id') {
+					db0('INSERT INTO columns(page, cname, weight, coutput, cmodify) VALUES(?, ?, ?, ?, ?)',
 											$humanName,
-											ucfirst($colum['column_name']),
-											$colum['ordinal_position'] * 5,
-											$colum['ordinal_position'] - 1,
-											'UPDATE ' . $tableName . ' SET ' . $colum['column_name'] . '=:value WHERE id=:row');
+											ucfirst($column['column_name']),
+											$column['ordinal_position'] * 5,
+											$column['ordinal_position'] - 1,
+											'UPDATE ' . $tableName . ' SET ' . $column['column_name'] . '=:value WHERE id=:row');
 				}
 			}
 		}

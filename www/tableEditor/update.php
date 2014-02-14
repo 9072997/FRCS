@@ -39,9 +39,9 @@
 		} else {
 			if(isset($_POST['row'])) {
 				$row = $_POST['row'];
-				$colum = $_POST['colum'];
+				$column = $_POST['column'];
 				// UPDATE or INSERT
-				$sql = db1('SELECT cmodify FROM colums WHERE id=?', $colum)->cmodify;
+				$sql = db1('SELECT cmodify FROM columns WHERE id=?', $column)->cmodify;
 				if(isset($_POST['value'])) {
 					$value = $_POST['value'];
 					foreach(explode(';', $sql) as $query) {

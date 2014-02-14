@@ -50,15 +50,15 @@
 		<?php
 			if(isset($_GET['page'])) {
 				$page = db1('SELECT prow, ptable FROM pages WHERE name=?', $_GET['page']);
-				$colums = dba('SELECT id, page, coutput, cname FROM colums WHERE page=? ORDER BY id ASC', $_GET['page']);
+				$columns = dba('SELECT id, page, coutput, cname FROM columns WHERE page=? ORDER BY id ASC', $_GET['page']);
 				?>
 				<script>
 					/////////////////
 					// PAGE CONFIG //
 					/////////////////
-					var cOutputs	=	<?php echo json_encode(array_column($colums, 'coutput')); ?>;
-					var cNames		=	<?php echo json_encode(array_column($colums, 'cname')); ?>;
-					var cIds		=	<?php echo json_encode(array_column($colums, 'id')); ?>;
+					var cOutputs	=	<?php echo json_encode(array_column($columns, 'coutput')); ?>;
+					var cNames		=	<?php echo json_encode(array_column($columns, 'cname')); ?>;
+					var cIds		=	<?php echo json_encode(array_column($columns, 'id')); ?>;
 					var pTable		=	'<?php echo $page->ptable; ?>';
 					var pRow		=	<?php echo $page->prow; ?>;
 					var page		=	'<?php echo urlencode($_GET['page']); ?>';
@@ -68,14 +68,14 @@
 						var tableRow = table.insertRow(-1);
 						tableRow.dataset.row = rowData[pRow];
 						
-						for(var displayColum=0; displayColum<cOutputs.length; displayColum++) {
+						for(var displayColumn=0; displayColumn<cOutputs.length; displayColumn++) {
 							var tableCell = tableRow.insertCell(-1);
 							
 							var input = document.createElement('input');
 							input.type = 'text';
-							input.value = rowData[cOutputs[displayColum]];
-							input.dataset.cOutput = cOutputs[displayColum];
-							input.dataset.cId = cIds[displayColum];
+							input.value = rowData[cOutputs[displayColumn]];
+							input.dataset.cOutput = cOutputs[displayColumn];
+							input.dataset.cId = cIds[displayColumn];
 							input.onfocus = function() {
 								this.style.backgroundColor = 'yellow';
 							};
@@ -114,7 +114,7 @@
 								request.open('POST','update.php?<?php echo htmlspecialchars(SID); ?>',true);
 								request.setRequestHeader('Content-type','application/x-www-form-urlencoded');
 								var pramiters = 'password=' + encodeURIComponent(passwordBox.value) + 
-												'&colum=' + encodeURIComponent(this.dataset.cId) +
+												'&column=' + encodeURIComponent(this.dataset.cId) +
 												'&row=' + encodeURIComponent(this.parentNode.parentNode.dataset.row);
 								if(this.value != '') {
 									pramiters += '&value=' + encodeURIComponent(this.value);
@@ -225,9 +225,9 @@
 									table = document.createElement('table');
 									
 									var headers = table.createTHead().insertRow(0);
-									for(var displayColum=0; displayColum<cOutputs.length; displayColum++) {
+									for(var displayColumn=0; displayColumn<cOutputs.length; displayColumn++) {
 										var cell = headers.insertCell(-1);
-										var title = document.createTextNode(cNames[displayColum]);
+										var title = document.createTextNode(cNames[displayColumn]);
 										cell.appendChild(title);
 									}
 									var cell = headers.insertCell(-1);
@@ -294,10 +294,10 @@
 												// if newData != data update html table and set row to green; set all cells to white
 												for(var dataRow=0; dataRow<data.length; dataRow++) {
 													if(data[dataRow][pRow] == newData[newDataRow][pRow]) {
-														for(var displayColum=0; displayColum<cOutputs.length; displayColum++) {
-															if(data[dataRow][cOutputs[displayColum]] != newData[newDataRow][cOutputs[displayColum]]) {
-																table.rows[tableRow].cells[displayColum].getElementsByTagName('input')[0].value = newData[newDataRow][cOutputs[displayColum]];
-																table.rows[tableRow].cells[displayColum].style.backgroundColor = null;
+														for(var displayColumn=0; displayColumn<cOutputs.length; displayColumn++) {
+															if(data[dataRow][cOutputs[displayColumn]] != newData[newDataRow][cOutputs[displayColumn]]) {
+																table.rows[tableRow].cells[displayColumn].getElementsByTagName('input')[0].value = newData[newDataRow][cOutputs[displayColumn]];
+																table.rows[tableRow].cells[displayColumn].style.backgroundColor = null;
 																table.rows[tableRow].style.backgroundColor = 'yellow';
 															}
 														}

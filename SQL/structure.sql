@@ -23,7 +23,7 @@ CREATE TABLE teams (
 	imageid int
 );
 
-CREATE TABLE heats (
+CREATE TABLE matches (
 	id SERIAL PRIMARY KEY,
 	number INT UNIQUE,
 	starttime timestamp
@@ -35,8 +35,8 @@ CREATE TYPE feildposition AS ENUM
 
 CREATE TABLE queueings (
 	id SERIAL PRIMARY KEY,
-	heat INT
-		REFERENCES heats (number)
+	match INT
+		REFERENCES matches (number)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
 	team INT
@@ -44,8 +44,8 @@ CREATE TABLE queueings (
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
 	position feildposition,
-	UNIQUE (heat, position),
-	UNIQUE (heat, team)
+	UNIQUE (match, position),
+	UNIQUE (match, team)
 );
 
 CREATE TABLE scouts (
@@ -60,14 +60,14 @@ CREATE TABLE sheets (
 		REFERENCES scouts (name)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
-	heat INT,
+	match INT,
 	team INT,
-	FOREIGN KEY (heat, team)
-		REFERENCES queueings (heat, team)
+	FOREIGN KEY (match, team)
+		REFERENCES queueings (match, team)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
-	UNIQUE (heat, scout),
-	UNIQUE (heat, team)
+	UNIQUE (match, scout),
+	UNIQUE (match, team)
 );
 
 CREATE TABLE pages (
@@ -93,9 +93,9 @@ CREATE TABLE columns (
 
 CREATE VIEW matchsheet AS
 	SELECT
-		heats.id AS id,
-		heats.number AS heat,
-		heats.starttime as starttime,
+		matches.id AS id,
+		matches.number AS match,
+		matches.starttime as starttime,
 		red1.team AS red1,
 		red2.team AS red2,
 		red3.team AS red3,
@@ -103,67 +103,67 @@ CREATE VIEW matchsheet AS
 		blue2.team AS blue2,
 		blue3.team AS blue3
 		
-	FROM heats
+	FROM matches
 		LEFT JOIN queueings red1 ON (
-				heats.number=red1.heat
+				matches.number=red1.match
 			AND
 				red1.position='red1'
 			)
 		
 		LEFT JOIN queueings red2 ON (
-				heats.number=red2.heat
+				matches.number=red2.match
 			AND
 				red2.position='red2'
 			)
 		
 		LEFT JOIN queueings red3 ON (
-				heats.number=red3.heat
+				matches.number=red3.match
 			AND
 				red3.position='red3'
 			)
 		
 		LEFT JOIN queueings blue1 ON (
-				heats.number=blue1.heat
+				matches.number=blue1.match
 			AND
 				blue1.position='blue1'
 			)
 		
 		LEFT JOIN queueings blue2 ON (
-				heats.number=blue2.heat
+				matches.number=blue2.match
 			AND
 				blue2.position='blue2'
 			)
 		
 		LEFT JOIN queueings blue3 ON (
-				heats.number=blue3.heat
+				matches.number=blue3.match
 			AND
 				blue3.position='blue3'
 			)
 
-	ORDER BY heat ASC;
+	ORDER BY match ASC;
 
 CREATE FUNCTION queueingupsert(INT, feildposition, INT) RETURNS VOID AS
 	$$
-		INSERT INTO queueings(heat, position)
+		INSERT INTO queueings(match, position)
 			SELECT $1, $2
 			WHERE NOT EXISTS (
-				SELECT 1 FROM queueings WHERE heat=$1 AND position=$2
+				SELECT 1 FROM queueings WHERE match=$1 AND position=$2
 			) AND
 			$1 IS NOT NULL AND
 			$2 IS NOT NULL AND
 			$3 IS NOT NULL;
-		UPDATE queueings SET team=$3 WHERE heat=$1 AND position=$2 AND
+		UPDATE queueings SET team=$3 WHERE match=$1 AND position=$2 AND
 			$1 IS NOT NULL AND
 			$2 IS NOT NULL AND
 			$3 IS NOT NULL;
-		DELETE FROM queueings WHERE heat=$1 AND position=$2 AND $3 IS NULL;
+		DELETE FROM queueings WHERE match=$1 AND position=$2 AND $3 IS NULL;
 			
 	$$
 	LANGUAGE sql VOLATILE;
 
 CREATE FUNCTION queueingsinsert(INT, timestamp, INT, INT, INT, INT, INT, INT) RETURNS VOID AS
 	$$
-		INSERT INTO heats(number, starttime) VALUES ($1, $2);
+		INSERT INTO matches(number, starttime) VALUES ($1, $2);
 		SELECT queueingupsert($1, 'red1', $3);
 		SELECT queueingupsert($1, 'red2', $4);
 		SELECT queueingupsert($1, 'red3', $5);
@@ -178,10 +178,10 @@ CREATE FUNCTION queueingsupdate(INT, INT, timestamp, INT, INT, INT, INT, INT, IN
 	$$
 		DELETE FROM queueings WHERE id IN (
 			SELECT queueings.id FROM queueings
-				LEFT JOIN heats ON queueings.heat=heats.number
-				WHERE heats.id=$1
+				LEFT JOIN matches ON queueings.match=matches.number
+				WHERE matches.id=$1
 			) AND $2 IS NULL;
-		UPDATE heats SET number=$2, starttime=$3 WHERE id=$1;
+		UPDATE matches SET number=$2, starttime=$3 WHERE id=$1;
 		SELECT queueingupsert($2, 'red1', $4);
 		SELECT queueingupsert($2, 'red2', $5);
 		SELECT queueingupsert($2, 'red3', $6);
@@ -193,12 +193,12 @@ CREATE FUNCTION queueingsupdate(INT, INT, timestamp, INT, INT, INT, INT, INT, IN
 	LANGUAGE sql VOLATILE;
 
 CREATE RULE update AS ON UPDATE TO matchsheet DO INSTEAD
-	SELECT queueingsupdate(NEW.id, NEW.heat, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
+	SELECT queueingsupdate(NEW.id, NEW.match, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
 
 CREATE RULE insert AS ON INSERT TO matchsheet DO INSTEAD
-	SELECT queueingsinsert(NEW.heat, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
+	SELECT queueingsinsert(NEW.match, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
 
 CREATE RULE delete AS ON DELETE TO matchsheet DO INSTEAD
-	DELETE FROM heats WHERE number=OLD.heat;
+	DELETE FROM matches WHERE number=OLD.match;
 
 CREATE SEQUENCE teamnamedup;

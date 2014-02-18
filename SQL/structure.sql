@@ -33,21 +33,6 @@ CREATE TYPE feildposition AS ENUM
 	('red1', 'red2', 'red3',
 	'blue1', 'blue2', 'blue3');
 
-CREATE TABLE queueings (
-	id SERIAL PRIMARY KEY,
-	match INT
-		REFERENCES matches (number)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	team INT
-		REFERENCES teams (number)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	position feildposition,
-	UNIQUE (match, position),
-	UNIQUE (match, team)
-);
-
 CREATE TABLE scouts (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(255) UNIQUE,
@@ -75,19 +60,23 @@ CREATE FUNCTION autonomusscoretypetoint(autonomusscoretype) RETURNS INT AS
 	LANGUAGE sql IMMUTABLE;
 CREATE CAST (autonomusscoretype AS INT) WITH FUNCTION autonomusscoretypetoint(autonomusscoretype);
 
-CREATE TABLE sheets (
+CREATE TABLE queueings (
 	id SERIAL PRIMARY KEY,
+	match INT
+		REFERENCES matches (number)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	team INT
+		REFERENCES teams (number)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	position feildposition,
 	scout VARCHAR(255)
 		REFERENCES scouts (name)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
-	match INT,
-	team INT,
-	FOREIGN KEY (match, team)
-		REFERENCES queueings (match, team)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
 	UNIQUE (match, scout),
+	UNIQUE (match, position),
 	UNIQUE (match, team),
 	
 	autonomusmove BOOLEAN,				-- 5 points			+5
@@ -102,6 +91,7 @@ CREATE TABLE sheets (
 	trusstoground INT,					-- 10 points		+10
 	trusstoalience INT,					-- +10 points		+20
 	passes INT,							-- 10 or 30 points	+15
+	receves INT,						-- 10 or 30 points	+15
 	teleopdeflected INT,				--					+10
 	
 	nontechnicalfouls INT,				-- 20 points		-20
@@ -129,7 +119,7 @@ CREATE TABLE columns (
 	cmodify TEXT
 );
 
-CREATE VIEW sheetstats AS
+CREATE VIEW queueingsview AS
 	SELECT *, (
 			CAST(COALESCE(autonomusmove, FALSE) AS INT)*5	+
 			CAST(COALESCE(autonomusball, 'none') AS INT)	+
@@ -139,13 +129,79 @@ CREATE VIEW sheetstats AS
 			COALESCE(trusstoground, 0)*10					+
 			COALESCE(trusstoalience, 0)*20					+
 			COALESCE(passes, 0)*15							+
+			COALESCE(receves, 0)*15							+
 			COALESCE(teleopdeflected, 0)*10					+
 			COALESCE(nontechnicalfouls, 0)*-20				+
 			COALESCE(technicalfouls, 0)*-50
 		) AS score
-	FROM sheets;
+	FROM queueings;
 
-CREATE VIEW matchsheet AS
+CREATE RULE update AS ON UPDATE TO queueingsview DO INSTEAD
+	UPDATE queueings SET
+		id=NEW.id,
+		match=NEW.match,
+		team=NEW.team,
+		position=NEW.position,
+		scout=NEW.scout,
+		autonomusmove=NEW.autonomusmove,
+		startedwithball=NEW.startedwithball,
+		autonomusball=NEW.autonomusball,
+		autonomusdeflected=NEW.autonomusdeflected,
+		teleophighfails=NEW.teleophighfails,
+		teleophighballs=NEW.teleophighballs,
+		teleoplowballs=NEW.teleoplowballs,
+		trussfails=NEW.trussfails,
+		trusstoground=NEW.trusstoground,
+		trusstoalience=NEW.trusstoalience,
+		passes=NEW.passes,
+		receves=NEW.receves,
+		teleopdeflected=NEW.teleopdeflected
+	WHERE id=OLD.id;
+CREATE RULE insert AS ON INSERT TO queueingsview DO INSTEAD
+	INSERT INTO queueings(
+		id,
+		match,
+		team,
+		position,
+		scout,
+		autonomusmove,
+		startedwithball,
+		autonomusball,
+		autonomusdeflected,
+		teleophighfails,
+		teleophighballs,
+		teleoplowballs,
+		trussfails,
+		trusstoground,
+		trusstoalience,
+		passes,
+		receves,
+		teleopdeflected
+	) VALUES (
+		COALESCE(NEW.id, NEXTVAL('queueings_id_seq')),
+		NEW.match,
+		NEW.team,
+		NEW.position,
+		NEW.scout,
+		NEW.autonomusmove,
+		NEW.startedwithball,
+		NEW.autonomusball,
+		NEW.autonomusdeflected,
+		NEW.teleophighfails,
+		NEW.teleophighballs,
+		NEW.teleoplowballs,
+		NEW.trussfails,
+		NEW.trusstoground,
+		NEW.trusstoalience,
+		NEW.passes,
+		NEW.receves,
+		NEW.teleopdeflected
+	);
+CREATE RULE delete AS ON DELETE TO queueingsview DO INSTEAD
+	DELETE FROM queueings WHERE id=OLD.id;
+
+
+CREATE VIEW matchesview AS
 	SELECT
 		matches.id AS id,
 		matches.number AS match,
@@ -156,12 +212,12 @@ CREATE VIEW matchsheet AS
 		blue1.team AS blue1,
 		blue2.team AS blue2,
 		blue3.team AS blue3,
-		(SELECT SUM(score) FROM sheetstats WHERE
-			sheetstats.match=matches.number AND
+		(SELECT SUM(score) FROM queueingsview WHERE
+			queueingsview.match=matches.number AND
 			team IN (red1.team, red2.team, red3.team)
 		) AS redscore,
-		(SELECT SUM(score) FROM sheetstats WHERE
-			sheetstats.match=matches.number AND
+		(SELECT SUM(score) FROM queueingsview WHERE
+			queueingsview.match=matches.number AND
 			team IN (blue1.team, blue2.team, blue3.team)
 		) AS bluescore
 	FROM matches
@@ -253,11 +309,11 @@ CREATE FUNCTION queueingsupdate(INT, INT, timestamp, INT, INT, INT, INT, INT, IN
 	$$
 	LANGUAGE sql VOLATILE;
 
-CREATE RULE update AS ON UPDATE TO matchsheet DO INSTEAD
-	SELECT queueingsupdate(NEW.id, NEW.match, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
-CREATE RULE insert AS ON INSERT TO matchsheet DO INSTEAD
+CREATE RULE update AS ON UPDATE TO matchesview DO INSTEAD
+	SELECT queueingsupdate(OLD.id, NEW.match, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
+CREATE RULE insert AS ON INSERT TO matchesview DO INSTEAD
 	SELECT queueingsinsert(NEW.match, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
-CREATE RULE delete AS ON DELETE TO matchsheet DO INSTEAD
-	DELETE FROM matches WHERE number=OLD.match;
+CREATE RULE delete AS ON DELETE TO matchesview DO INSTEAD
+	DELETE FROM matches WHERE id=OLD.id;
 
 CREATE SEQUENCE teamnamedup;

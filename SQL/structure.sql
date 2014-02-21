@@ -118,7 +118,7 @@ CREATE TABLE columns (
 	weight INT,
 	cmodify TEXT
 );
-
+------------------------------------------------------------------------
 CREATE VIEW queueingsview AS
 	SELECT *, (
 			CAST(COALESCE(autonomusmove, FALSE) AS INT)*5	+
@@ -135,7 +135,6 @@ CREATE VIEW queueingsview AS
 			COALESCE(technicalfouls, 0)*-50
 		) AS score
 	FROM queueings;
-
 CREATE RULE update AS ON UPDATE TO queueingsview DO INSTEAD
 	UPDATE queueings SET
 		id=NEW.id,
@@ -199,8 +198,7 @@ CREATE RULE insert AS ON INSERT TO queueingsview DO INSTEAD
 	);
 CREATE RULE delete AS ON DELETE TO queueingsview DO INSTEAD
 	DELETE FROM queueings WHERE id=OLD.id;
-
-
+------------------------------------------------------------------------
 CREATE VIEW matchesview AS
 	SELECT
 		matches.id AS id,
@@ -315,5 +313,38 @@ CREATE RULE insert AS ON INSERT TO matchesview DO INSTEAD
 	SELECT queueingsinsert(NEW.match, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
 CREATE RULE delete AS ON DELETE TO matchesview DO INSTEAD
 	DELETE FROM matches WHERE id=OLD.id;
-
+------------------------------------------------------------------------
+CREATE VIEW teamsview AS
+	SELECT *, (
+			SELECT AVG(score) FROM queueingsview WHERE queueingsview.team=teams.number AND queueingsview.score IS NOT NULL
+		) AS averageSore
+	FROM teams;
+CREATE RULE update AS ON UPDATE TO teamsview DO INSTEAD
+	UPDATE teams SET
+		id=NEW.id,
+		number=NEW.number,
+		name=NEW.name,
+		robotname=NEW.robotname,
+		type=NEW.type,
+		imageid=NEW.imageid
+	WHERE id=OLD.id;
+CREATE RULE insert AS ON INSERT TO teamsview DO INSTEAD
+	INSERT INTO teams(
+		id,
+		number,
+		name,
+		robotname,
+		type,
+		imageid
+	) VALUES (
+		COALESCE(NEW.id, NEXTVAL('teams_id_seq')),
+		NEW.number,
+		NEW.name,
+		NEW.robotname,
+		NEW.type,
+		NEW.imageid
+	);
+CREATE RULE delete AS ON DELETE TO teamsview DO INSTEAD
+	DELETE FROM teams WHERE id=OLD.id;
+------------------------------------------------------------------------
 CREATE SEQUENCE teamnamedup;

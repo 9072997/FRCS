@@ -201,9 +201,7 @@ CREATE RULE delete AS ON DELETE TO queueingsview DO INSTEAD
 ------------------------------------------------------------------------
 CREATE VIEW matchesview AS
 	SELECT
-		matches.id AS id,
-		matches.number AS match,
-		matches.starttime as starttime,
+		matches.*,
 		red1.team AS red1,
 		red2.team AS red2,
 		red3.team AS red3,
@@ -255,7 +253,7 @@ CREATE VIEW matchesview AS
 				blue3.position='blue3'
 			)
 		
-	ORDER BY match ASC;
+	ORDER BY matches.number ASC;
 
 CREATE FUNCTION queueingupsert(INT, feildposition, INT) RETURNS VOID AS
 	$$
@@ -308,9 +306,9 @@ CREATE FUNCTION queueingsupdate(INT, INT, timestamp, INT, INT, INT, INT, INT, IN
 	LANGUAGE sql VOLATILE;
 
 CREATE RULE update AS ON UPDATE TO matchesview DO INSTEAD
-	SELECT queueingsupdate(OLD.id, NEW.match, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
+	SELECT queueingsupdate(OLD.id, NEW.number, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
 CREATE RULE insert AS ON INSERT TO matchesview DO INSTEAD
-	SELECT queueingsinsert(NEW.match, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
+	SELECT queueingsinsert(NEW.number, NEW.starttime, NEW.red1, NEW.red2, NEW.red3, NEW.blue1, NEW.blue2, NEW.blue3);
 CREATE RULE delete AS ON DELETE TO matchesview DO INSTEAD
 	DELETE FROM matches WHERE id=OLD.id;
 ------------------------------------------------------------------------

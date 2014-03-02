@@ -20,7 +20,7 @@ CREATE TABLE teams (
 	name VARCHAR(255) UNIQUE,
 	robotname VARCHAR(255) UNIQUE,
 	type VARCHAR(255),
-	imageid int
+	imageid VARCHAR(255) UNIQUE
 );
 
 CREATE TABLE matches (
@@ -313,7 +313,9 @@ CREATE RULE delete AS ON DELETE TO matchesview DO INSTEAD
 	DELETE FROM matches WHERE id=OLD.id;
 ------------------------------------------------------------------------
 CREATE VIEW teamsview AS
-	SELECT *, (
+	SELECT id, number, name, robotname, type,
+		COALESCE(imageid, 'default.jpg'),
+		(
 			SELECT AVG(score) FROM queueingsview WHERE queueingsview.team=teams.number AND queueingsview.score IS NOT NULL
 		) AS averageSore
 	FROM teams;

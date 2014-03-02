@@ -30,6 +30,6 @@
 	db0('DELETE FROM pages WHERE ptable=\'teams\'');
 	db0('DELETE FROM pages WHERE ptable=\'queueings\'');
 	db0('UPDATE pages SET query=\'SELECT id, name, \'\'HIDDEN\'\' FROM scouts\' WHERE ptable=\'scouts\''); // prevents passwords from becomeing visible
-	db0('INSERT INTO scouts(password) VALUES (\'frc\')'); // sets default password to frc, you should change is as soon as setup is done
+	db0('INSERT INTO scouts(name, password) VALUES (\'admin\', \'frc\')'); // sets default password to frc, you should change is as soon as setup is done
 	require_once(dirname(__FILE__) . '/getTeams.php');
 ?>

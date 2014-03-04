@@ -23,6 +23,7 @@
 ?><!DOCTYPE html>
 <html>
 	<head>
+		<title>Table Editor</title>
 		<style>
 			table {
 				border-collapse:collapse;
@@ -36,6 +37,10 @@
 	
 	<body>
 		<div>
+			Table Editor
+			<a href="../images">Image Manager</a>
+			<a href="../printables/sheets.php">Sheets</a>
+			<a href="../printables/matches.php?<?php echo htmlspecialchars(SID); ?>">Matches</a> | 
 			<?php
 				$pages = db('SELECT name FROM pages ORDER BY weight, id ASC');
 				foreach($pages as $page) {

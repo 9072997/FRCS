@@ -96,4 +96,16 @@
 			return json_encode($query->fetchAll(PDO::FETCH_NUM));
 		}
 	}
+	
+	function dp($sql) {
+		$prams = func_get_args();
+		array_shift($prams);
+		$query = dbQuery($sql, $prams);
+		if($query === false) {
+			return false;
+		} else {
+			echo $query->fetch(PDO::FETCH_NUM)[0];
+			return true;
+		}
+	}
 ?>

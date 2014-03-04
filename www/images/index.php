@@ -242,7 +242,7 @@ $_CONFIG['require_login'] = false;
 // Default: $_CONFIG['users'] = array();
 //
 require_once(dirname(__FILE__) . '/../../includes/db.inc.php');
-$_CONFIG['users'] = array_map(array_values, dba('SELECT name, password, \'admin\' FROM scouts'));
+$_CONFIG['users'] = array_map('array_values', dba('SELECT name, password, \'admin\' FROM scouts'));
 
 //
 // Seaded uploadimiseks, uute kaustade loomiseks ja kustutamiseks.

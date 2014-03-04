@@ -88,8 +88,9 @@ CREATE TABLE queueings (
 	teleophighballs INT,				-- 10 points		+10
 	teleoplowballs INT,					-- 1 point			+1
 	trussfails INT,						--
-	trusstoground INT,					-- 10 points		+10
-	trusstoalience INT,					-- +10 points		+20
+	trusspasses INT,					-- +10 points		+25
+	trussreceves INT,					-- ++10 points		+25
+	trussdrops INT,						--
 	passes INT,							-- 10 or 30 points	+15
 	receves INT,						-- 10 or 30 points	+15
 	teleopdeflected INT,				--					+10
@@ -126,8 +127,8 @@ CREATE VIEW queueingsview AS
 			COALESCE(autonomusdeflected, 0)*17.5			+
 			COALESCE(teleophighballs, 0)*10					+
 			COALESCE(teleoplowballs, 0)*1					+
-			COALESCE(trusstoground, 0)*10					+
-			COALESCE(trusstoalience, 0)*20					+
+			COALESCE(trusspasses, 0)*25						+
+			COALESCE(trussreceves, 0)*25					+
 			COALESCE(passes, 0)*15							+
 			COALESCE(receves, 0)*15							+
 			COALESCE(teleopdeflected, 0)*10					+
@@ -150,11 +151,14 @@ CREATE RULE update AS ON UPDATE TO queueingsview DO INSTEAD
 		teleophighballs=NEW.teleophighballs,
 		teleoplowballs=NEW.teleoplowballs,
 		trussfails=NEW.trussfails,
-		trusstoground=NEW.trusstoground,
-		trusstoalience=NEW.trusstoalience,
+		trusspasses=NEW.trusspasses,
+		trussreceves=NEW.trussreceves,
+		trussdrops=NEW.trussdrops,
 		passes=NEW.passes,
 		receves=NEW.receves,
-		teleopdeflected=NEW.teleopdeflected
+		teleopdeflected=NEW.teleopdeflected,
+		nontechnicalfouls=NEW.nontechnicalfouls,
+		technicalfouls=NEW.technicalfouls
 	WHERE id=OLD.id;
 CREATE RULE insert AS ON INSERT TO queueingsview DO INSTEAD
 	INSERT INTO queueings(
@@ -171,11 +175,14 @@ CREATE RULE insert AS ON INSERT TO queueingsview DO INSTEAD
 		teleophighballs,
 		teleoplowballs,
 		trussfails,
-		trusstoground,
-		trusstoalience,
+		trusspasses,
+		trussreceves,
+		trussdrops,
 		passes,
 		receves,
-		teleopdeflected
+		teleopdeflected,
+		nontechnicalfouls,
+		technicalfouls
 	) VALUES (
 		COALESCE(NEW.id, NEXTVAL('queueings_id_seq')),
 		NEW.match,
@@ -190,11 +197,14 @@ CREATE RULE insert AS ON INSERT TO queueingsview DO INSTEAD
 		NEW.teleophighballs,
 		NEW.teleoplowballs,
 		NEW.trussfails,
-		NEW.trusstoground,
-		NEW.trusstoalience,
+		NEW.trusspasses,
+		NEW.trussreceves,
+		NEW.trussdrops,
 		NEW.passes,
 		NEW.receves,
-		NEW.teleopdeflected
+		NEW.teleopdeflected,
+		NEW.nontechnicalfouls,
+		NEW.technicalfouls
 	);
 CREATE RULE delete AS ON DELETE TO queueingsview DO INSTEAD
 	DELETE FROM queueings WHERE id=OLD.id;
@@ -314,10 +324,10 @@ CREATE RULE delete AS ON DELETE TO matchesview DO INSTEAD
 ------------------------------------------------------------------------
 CREATE VIEW teamsview AS
 	SELECT id, number, name, robotname, type,
-		COALESCE(imageid, 'default.jpg'),
+		COALESCE(imageid, 'default.jpg') AS imageid,
 		(
 			SELECT AVG(score) FROM queueingsview WHERE queueingsview.team=teams.number AND queueingsview.score IS NOT NULL
-		) AS averageSore
+		) AS averagesore
 	FROM teams;
 CREATE RULE update AS ON UPDATE TO teamsview DO INSTEAD
 	UPDATE teams SET

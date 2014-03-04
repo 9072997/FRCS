@@ -20,12 +20,19 @@
 	header('Content-type: application/vnd.oasis.opendocument.text');
 	header('Content-Disposition: attachment; filename="sheets.fodt"');
 	
-	$queueings = db('SELECT queueingsview.match, queueingsview.team, queueingsview.scout FROM queueingsview LEFT JOIN matchesview ON queueingsview.match=matchesview.number WHERE matchesview.starttime > current_timestamp');
-?>
-<<?php echo '?xml'; // this avoids short tag errors?> version="1.0" encoding="UTF-8"?>
+	$queueings = db('SELECT queueingsview.match, queueingsview.team, queueingsview.scout FROM queueingsview LEFT JOIN matchesview ON queueingsview.match=matchesview.number WHERE matchesview.starttime > current_timestamp ORDER BY matchview.number ASC');
+	echo '<?xml'; // this avoids short tag errors
+?> version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><meta:creation-date>2014-02-26T08:36:16</meta:creation-date><dc:date>2014-02-26T15:14:50</dc:date><meta:editing-duration>PT19M13S</meta:editing-duration><meta:editing-cycles>14</meta:editing-cycles><meta:generator>LibreOffice/3.5$Linux_x86 LibreOffice_project/350m1$Build-2</meta:generator><meta:document-statistic meta:character-count="<?php echo 1462 * count($queueings); ?>" meta:image-count="0" meta:non-whitespace-character-count="<?php echo 943 * count($queueings); ?>" meta:object-count="0" meta:page-count="<?php count($queueings); ?>" meta:paragraph-count="<?php echo 73 * count($queueings); ?>" meta:table-count="<?php echo 3 * count($queueings); ?>" meta:word-count="<?php echo 588 * count($queueings); ?>"/></office:meta>
+ <office:meta>
+  <meta:creation-date>2014-02-26T08:36:16</meta:creation-date>
+  <dc:date>2014-02-26T15:14:50</dc:date>
+  <meta:editing-duration>PT19M13S</meta:editing-duration>
+  <meta:editing-cycles>14</meta:editing-cycles>
+  <meta:generator>LibreOffice/3.5$Linux_x86 LibreOffice_project/350m1$Build-2</meta:generator>
+  <meta:document-statistic meta:character-count="<?php echo 1576 * count($queueings); ?>" meta:image-count="0" meta:non-whitespace-character-count="<?php echo 1011 * count($queueings); ?>" meta:object-count="0" meta:page-count="<?php count($queueings); ?>" meta:paragraph-count="<?php echo 7 * count($queueings); ?>" meta:table-count="<?php echo 3 * count($queueings); ?>" meta:word-count="<?php echo 639 * count($queueings); ?>"/>
+  </office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
    <config:config-item config:name="ViewAreaTop" config:type="int">0</config:config-item>
@@ -459,7 +466,7 @@
       <text:p text:style-name="P12">Total: ___</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table5.A2" office:value-type="string">
-      <text:p text:style-name="P12">truss to ground</text:p>
+      <text:p text:style-name="P12">deflected balls</text:p>
       <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
       <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
       <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
@@ -477,7 +484,7 @@
      </table:table-cell>
      <table:table-cell table:style-name="Table5.A2" office:value-type="string">
       <text:p text:style-name="P12"/>
-      <text:p text:style-name="P12">truss to alliance</text:p>
+      <text:p text:style-name="P12">passes</text:p>
       <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
       <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
       <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
@@ -495,24 +502,6 @@
      </table:table-cell>
      <table:table-cell table:style-name="Table5.A2" office:value-type="string">
       <text:p text:style-name="P12"/>
-      <text:p text:style-name="P12">passes</text:p>
-      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
-      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
-      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
-      <text:p text:style-name="P12">Total: ___</text:p>
-     </table:table-cell>
-    </table:table-row>
-    <table:table-row>
-     <table:table-cell table:style-name="Table5.A2" office:value-type="string">
-      <text:p text:style-name="P12"/>
-      <text:p text:style-name="P12">failed truss throws</text:p>
-      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
-      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
-      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
-      <text:p text:style-name="P12">Total: ___</text:p>
-     </table:table-cell>
-     <table:table-cell table:style-name="Table5.A2" office:value-type="string">
-      <text:p text:style-name="P12"/>
       <text:p text:style-name="P12">received passes</text:p>
       <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
       <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
@@ -521,15 +510,38 @@
      </table:table-cell>
     </table:table-row>
     <table:table-row>
-     <table:table-cell table:style-name="Table5.A2" table:number-columns-spanned="2" office:value-type="string">
+     <table:table-cell table:style-name="Table5.A2" office:value-type="string">
       <text:p text:style-name="P12"/>
-      <text:p text:style-name="P12">deflected balls</text:p>
+      <text:p text:style-name="P12">failed truss shots</text:p>
       <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
       <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
       <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
       <text:p text:style-name="P12">Total: ___</text:p>
      </table:table-cell>
-     <table:covered-table-cell/>
+     <table:table-cell table:style-name="Table5.A2" office:value-type="string">
+      <text:p text:style-name="P12"/>
+      <text:p text:style-name="P12">failed truss catches</text:p>
+      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
+      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
+      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
+      <text:p text:style-name="P12">Total: ___</text:p>
+     </table:table-cell>
+    </table:table-row>
+    <table:table-row>
+     <table:table-cell table:style-name="Table5.A2" office:value-type="string">
+      <text:p text:style-name="P12">truss shots</text:p>
+      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
+      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
+      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
+      <text:p text:style-name="P12">Total: ___</text:p>
+     </table:table-cell>
+     <table:table-cell table:style-name="Table5.A2" office:value-type="string">
+      <text:p text:style-name="P12">truss catches</text:p>
+      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
+      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
+      <text:p text:style-name="P12">□ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □</text:p>
+      <text:p text:style-name="P12">Total: ___</text:p>
+     </table:table-cell>
     </table:table-row>
     <table:table-row>
      <table:table-cell table:style-name="Table5.A1" table:number-columns-spanned="2" office:value-type="string">

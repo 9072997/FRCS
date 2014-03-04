@@ -22,6 +22,26 @@
 	
 	$m = $_GET['match'];
 	
+	function openImage ($file) {
+	    $size = getimagesize($file);
+	    switch($size["mime"])
+	    {
+			case "image/jpeg":
+				$im = imagecreatefromjpeg($file);
+			break;
+			case "image/gif":
+				$im = imagecreatefromgif($file);
+			break;
+			case "image/png":
+				$im = imagecreatefrompng($file);
+			break;
+			default:
+				$im=null;
+			break;
+	    }
+	    return $im;
+	}
+	
 	echo '<?xml'; // this avoids short tag errors
 ?> version="1.0" encoding="UTF-8"?>
 
@@ -457,8 +477,8 @@
        <table:table-column table:style-name="Table3.A" table:number-columns-repeated="2"/>
        <table:table-row>
         <table:table-cell table:style-name="Table3.A1" table:number-columns-spanned="2" office:value-type="string">
-         <text:p text:style-name="P2">T-Name:<?php dp('SELECT name FROM teamsview WHERE teamsview.number=(SELECT red1 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
-         <text:p text:style-name="P2">R-Name:<?php dp('SELECT robotname FROM teamsview WHERE teamsview.number=(SELECT red1 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
+         <text:p text:style-name="P2">T-Name:<?php dp('SELECT LEFT(name, 20) FROM teamsview WHERE teamsview.number=(SELECT red1 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
+         <text:p text:style-name="P2">R-Name:<?php dp('SELECT LEFT(robotname, 20) FROM teamsview WHERE teamsview.number=(SELECT red1 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
          <text:p text:style-name="P11">R-Type:<?php dp('SELECT type FROM teamsview WHERE teamsview.number=(SELECT red1 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
         </table:table-cell>
         <table:covered-table-cell/>
@@ -473,7 +493,17 @@
             <office:binary-data>
 				<?php
 					$imageid = db1('SELECT imageid FROM teamsview WHERE teamsview.number=(SELECT red1 FROM matchesview WHERE matchesview.number=?)', $m)->imageid;
-					echo base64_encode(file_get_contents(dirname(__FILE__) . '/../images/' . $imageid));
+					$image = openImage(dirname(__FILE__) . '/../images/' . $imageid);
+					$thumbnail = imagecreatetruecolor(100, 100);
+					imagecopyresampled($thumbnail, $image, 0, 0, 0, 0, 100, 100, imagesx($image), imagesy($image));
+					
+					ob_start();
+					imagejpeg($thumbnail, NULL, 75);
+					$jpeg = ob_get_clean();
+					
+					echo base64_encode($jpeg);
+					imagedestroy($image);
+					imagedestroy($thumbnail);
 				?>
             </office:binary-data>
            </draw:image>
@@ -521,8 +551,8 @@
        <table:table-column table:style-name="Table3.A" table:number-columns-repeated="2"/>
        <table:table-row>
         <table:table-cell table:style-name="Table3.A1" table:number-columns-spanned="2" office:value-type="string">
-         <text:p text:style-name="P2">T-Name:<?php dp('SELECT name FROM teamsview WHERE teamsview.number=(SELECT red2 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
-         <text:p text:style-name="P2">R-Name:<?php dp('SELECT robotname FROM teamsview WHERE teamsview.number=(SELECT red2 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
+         <text:p text:style-name="P2">T-Name:<?php dp('SELECT LEFT(name, 20) FROM teamsview WHERE teamsview.number=(SELECT red2 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
+         <text:p text:style-name="P2">R-Name:<?php dp('SELECT LEFT(robotname, 20) FROM teamsview WHERE teamsview.number=(SELECT red2 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
          <text:p text:style-name="P11">R-Type:<?php dp('SELECT type FROM teamsview WHERE teamsview.number=(SELECT red2 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
         </table:table-cell>
         <table:covered-table-cell/>
@@ -537,7 +567,17 @@
             <office:binary-data>
 				<?php
 					$imageid = db1('SELECT imageid FROM teamsview WHERE teamsview.number=(SELECT red2 FROM matchesview WHERE matchesview.number=?)', $m)->imageid;
-					echo base64_encode(file_get_contents(dirname(__FILE__) . '/../images/' . $imageid));
+					$image = openImage(dirname(__FILE__) . '/../images/' . $imageid);
+					$thumbnail = imagecreatetruecolor(100, 100);
+					imagecopyresampled($thumbnail, $image, 0, 0, 0, 0, 100, 100, imagesx($image), imagesy($image));
+					
+					ob_start();
+					imagejpeg($thumbnail, NULL, 75);
+					$jpeg = ob_get_clean();
+					
+					echo base64_encode($jpeg);
+					imagedestroy($image);
+					imagedestroy($thumbnail);
 				?>
             </office:binary-data>
            </draw:image>
@@ -585,8 +625,8 @@
        <table:table-column table:style-name="Table3.A" table:number-columns-repeated="2"/>
        <table:table-row>
         <table:table-cell table:style-name="Table3.A1" table:number-columns-spanned="2" office:value-type="string">
-         <text:p text:style-name="P2">T-Name:<?php dp('SELECT name FROM teamsview WHERE teamsview.number=(SELECT red3 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
-         <text:p text:style-name="P2">R-Name:<?php dp('SELECT robotname FROM teamsview WHERE teamsview.number=(SELECT red3 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
+         <text:p text:style-name="P2">T-Name:<?php dp('SELECT LEFT(name, 20) FROM teamsview WHERE teamsview.number=(SELECT red3 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
+         <text:p text:style-name="P2">R-Name:<?php dp('SELECT LEFT(robotname, 20) FROM teamsview WHERE teamsview.number=(SELECT red3 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
          <text:p text:style-name="P11">R-Type:<?php dp('SELECT type FROM teamsview WHERE teamsview.number=(SELECT red3 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
         </table:table-cell>
         <table:covered-table-cell/>
@@ -601,7 +641,17 @@
             <office:binary-data>
 				<?php
 					$imageid = db1('SELECT imageid FROM teamsview WHERE teamsview.number=(SELECT red3 FROM matchesview WHERE matchesview.number=?)', $m)->imageid;
-					echo base64_encode(file_get_contents(dirname(__FILE__) . '/../images/' . $imageid));
+					$image = openImage(dirname(__FILE__) . '/../images/' . $imageid);
+					$thumbnail = imagecreatetruecolor(100, 100);
+					imagecopyresampled($thumbnail, $image, 0, 0, 0, 0, 100, 100, imagesx($image), imagesy($image));
+					
+					ob_start();
+					imagejpeg($thumbnail, NULL, 75);
+					$jpeg = ob_get_clean();
+					
+					echo base64_encode($jpeg);
+					imagedestroy($image);
+					imagedestroy($thumbnail);
 				?>
             </office:binary-data>
            </draw:image>
@@ -656,8 +706,8 @@
        <table:table-column table:style-name="Table3.A" table:number-columns-repeated="2"/>
        <table:table-row>
         <table:table-cell table:style-name="Table3.A1" table:number-columns-spanned="2" office:value-type="string">
-         <text:p text:style-name="P2">T-Name:<?php dp('SELECT name FROM teamsview WHERE teamsview.number=(SELECT blue1 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
-         <text:p text:style-name="P2">R-Name:<?php dp('SELECT robotname FROM teamsview WHERE teamsview.number=(SELECT blue1 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
+         <text:p text:style-name="P2">T-Name:<?php dp('SELECT LEFT(name, 20) FROM teamsview WHERE teamsview.number=(SELECT blue1 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
+         <text:p text:style-name="P2">R-Name:<?php dp('SELECT LEFT(robotname, 20) FROM teamsview WHERE teamsview.number=(SELECT blue1 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
          <text:p text:style-name="P11">R-Type:<?php dp('SELECT type FROM teamsview WHERE teamsview.number=(SELECT blue1 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
         </table:table-cell>
         <table:covered-table-cell/>
@@ -672,7 +722,17 @@
             <office:binary-data>
 				<?php
 					$imageid = db1('SELECT imageid FROM teamsview WHERE teamsview.number=(SELECT blue1 FROM matchesview WHERE matchesview.number=?)', $m)->imageid;
-					echo base64_encode(file_get_contents(dirname(__FILE__) . '/../images/' . $imageid));
+					$image = openImage(dirname(__FILE__) . '/../images/' . $imageid);
+					$thumbnail = imagecreatetruecolor(100, 100);
+					imagecopyresampled($thumbnail, $image, 0, 0, 0, 0, 100, 100, imagesx($image), imagesy($image));
+					
+					ob_start();
+					imagejpeg($thumbnail, NULL, 75);
+					$jpeg = ob_get_clean();
+					
+					echo base64_encode($jpeg);
+					imagedestroy($image);
+					imagedestroy($thumbnail);
 				?>
             </office:binary-data>
            </draw:image>
@@ -720,8 +780,8 @@
        <table:table-column table:style-name="Table3.A" table:number-columns-repeated="2"/>
        <table:table-row>
         <table:table-cell table:style-name="Table3.A1" table:number-columns-spanned="2" office:value-type="string">
-         <text:p text:style-name="P2">T-Name:<?php dp('SELECT name FROM teamsview WHERE teamsview.number=(SELECT blue2 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
-         <text:p text:style-name="P2">R-Name:<?php dp('SELECT robotname FROM teamsview WHERE teamsview.number=(SELECT blue2 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
+         <text:p text:style-name="P2">T-Name:<?php dp('SELECT LEFT(name, 20) FROM teamsview WHERE teamsview.number=(SELECT blue2 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
+         <text:p text:style-name="P2">R-Name:<?php dp('SELECT LEFT(robotname, 20) FROM teamsview WHERE teamsview.number=(SELECT blue2 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
          <text:p text:style-name="P11">R-Type:<?php dp('SELECT type FROM teamsview WHERE teamsview.number=(SELECT blue2 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
         </table:table-cell>
         <table:covered-table-cell/>
@@ -736,7 +796,17 @@
             <office:binary-data>
 				<?php
 					$imageid = db1('SELECT imageid FROM teamsview WHERE teamsview.number=(SELECT blue2 FROM matchesview WHERE matchesview.number=?)', $m)->imageid;
-					echo base64_encode(file_get_contents(dirname(__FILE__) . '/../images/' . $imageid));
+					$image = openImage(dirname(__FILE__) . '/../images/' . $imageid);
+					$thumbnail = imagecreatetruecolor(100, 100);
+					imagecopyresampled($thumbnail, $image, 0, 0, 0, 0, 100, 100, imagesx($image), imagesy($image));
+					
+					ob_start();
+					imagejpeg($thumbnail, NULL, 75);
+					$jpeg = ob_get_clean();
+					
+					echo base64_encode($jpeg);
+					imagedestroy($image);
+					imagedestroy($thumbnail);
 				?>
             </office:binary-data>
            </draw:image>
@@ -784,8 +854,8 @@
        <table:table-column table:style-name="Table3.A" table:number-columns-repeated="2"/>
        <table:table-row>
         <table:table-cell table:style-name="Table3.A1" table:number-columns-spanned="2" office:value-type="string">
-         <text:p text:style-name="P2">T-Name:<?php dp('SELECT name FROM teamsview WHERE teamsview.number=(SELECT blue3 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
-         <text:p text:style-name="P2">R-Name:<?php dp('SELECT robotname FROM teamsview WHERE teamsview.number=(SELECT blue3 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
+         <text:p text:style-name="P2">T-Name:<?php dp('SELECT LEFT(name, 20) FROM teamsview WHERE teamsview.number=(SELECT blue3 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
+         <text:p text:style-name="P2">R-Name:<?php dp('SELECT LEFT(robotname, 20) FROM teamsview WHERE teamsview.number=(SELECT blue3 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
          <text:p text:style-name="P11">R-Type:<?php dp('SELECT type FROM teamsview WHERE teamsview.number=(SELECT blue3 FROM matchesview WHERE matchesview.number=?)', $m);?></text:p>
         </table:table-cell>
         <table:covered-table-cell/>
@@ -800,7 +870,17 @@
             <office:binary-data>
 				<?php
 					$imageid = db1('SELECT imageid FROM teamsview WHERE teamsview.number=(SELECT blue3 FROM matchesview WHERE matchesview.number=?)', $m)->imageid;
-					echo base64_encode(file_get_contents(dirname(__FILE__) . '/../images/' . $imageid));
+					$image = openImage(dirname(__FILE__) . '/../images/' . $imageid);
+					$thumbnail = imagecreatetruecolor(100, 100);
+					imagecopyresampled($thumbnail, $image, 0, 0, 0, 0, 100, 100, imagesx($image), imagesy($image));
+					
+					ob_start();
+					imagejpeg($thumbnail, NULL, 75);
+					$jpeg = ob_get_clean();
+					
+					echo base64_encode($jpeg);
+					imagedestroy($image);
+					imagedestroy($thumbnail);
 				?>
             </office:binary-data>
            </draw:image>

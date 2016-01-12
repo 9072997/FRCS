@@ -20,7 +20,7 @@
 	header('Content-type: application/vnd.oasis.opendocument.text');
 	header('Content-Disposition: attachment; filename="sheets.fodt"');
 	
-	$queueings = db('SELECT queueingsview.match, queueingsview.team, queueingsview.scout FROM queueingsview LEFT JOIN matchesview ON queueingsview.match=matchesview.number WHERE matchesview.starttime > current_timestamp ORDER BY matchview.number ASC');
+	$queueings = db('SELECT queueingsview.match, queueingsview.team, queueingsview.scout FROM queueingsview LEFT JOIN matchesview ON queueingsview.match=matchesview.number WHERE matchesview.starttime > current_timestamp ORDER BY matchesview.number ASC');
 	echo '<?xml'; // this avoids short tag errors
 ?> version="1.0" encoding="UTF-8"?>
 
